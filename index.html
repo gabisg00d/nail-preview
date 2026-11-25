@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nail Art Preview</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nail Preview">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2a1d24">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: salon fitting room — calm, tactile, a little luxe.
+   IDEA: a character-creator stage, but only hands and nails.
+   PICTURE: two hands on a velvet backdrop, nails live-rendered.
+   COLOUR and TYPE: velvet plum stage, porcelain panels, gold accent; Fraunces + Figtree.
+   LAYOUT: stage left (big), creator panel right; stacks on phones. */
+:root{color-scheme:light dark;--bg:light-dark(#f6f1ee,#151113);--panel:light-dark(#ffffff,#211b1e);--ink:light-dark(#241a1f,#f3eae6);--mute:light-dark(#76666d,#b3a3a9);--line:light-dark(#e8dcd8,#3a2f34);--stage:#2a1d24;--stage2:#120c10;--gold:#c9a24e;--acc:light-dark(#8a3d5c,#e39bb8)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif;overflow-x:clip}
+header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:18px max(3vw,16px) 10px}
+h1{font:600 clamp(26px,3.4vw,36px)/1.05 Fraunces,Georgia,serif;margin:0}
+header p{margin:0;color:var(--mute);font-size:14px}
+main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:16px;padding:0 max(3vw,16px) 24px}
+.stage{position:relative;border-radius:18px;background:radial-gradient(120% 90% at 50% 30%,var(--stage),var(--stage2));overflow:hidden;align-self:start}
+.stage svg{width:100%;height:min(70vh,620px);min-height:340px;display:block;touch-action:manipulation}
+.bar{display:flex;flex-wrap:wrap;gap:8px;padding:12px;align-items:center}
+.seg{display:inline-flex;background:#ffffff14;border-radius:999px;padding:3px}
+.seg button{background:none;border:0;color:#e8dde1;font:500 14px Figtree,sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;min-height:36px}
+.seg button[aria-pressed=true]{background:#f3e7ea;color:#2a1d24}
+.hint{color:#cdbcc3;font-size:13px;margin-left:auto}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:18px}
+h2{font:600 15px/1.2 Figtree,sans-serif;margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+h2 small{font-weight:400;color:var(--mute);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px}
+.sw{border:1.5px solid var(--line);background:light-dark(#faf6f4,#2a2226);border-radius:12px;padding:6px 2px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;min-height:44px}
+.sw svg{width:30px;height:48px}
+.sw span{font-size:11px;line-height:1.2;color:var(--mute);text-align:center;padding:2px;height:2.5em;overflow:hidden}
+.sw[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 30%,transparent)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:8px 14px;font:500 14px Figtree,sans-serif;cursor:pointer;min-height:40px}
+.chip[aria-pressed=true]{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent)}
+.skin{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);cursor:pointer}
+.skin[aria-pressed=true]{outline:3px solid var(--acc);outline-offset:2px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:11px 16px;font:600 15px Figtree,sans-serif;cursor:pointer;min-height:44px}
+.btn.ghost{background:none;color:var(--ink);border:1.5px solid var(--line)}
+button:focus-visible,input:focus-visible,label:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+.order{font-size:14px;background:light-dark(#faf6f4,#2a2226);border-radius:12px;padding:10px 12px;white-space:pre-wrap;margin:0 0 8px;max-height:220px;overflow:auto}
+input[type=text]{width:100%;font:16px Figtree,sans-serif;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:none;color:var(--ink);margin-bottom:8px}
+.upload{display:inline-flex;align-items:center;cursor:pointer}
+.upload input{position:absolute;opacity:0;width:1px;height:1px}
+.note{font-size:13px;color:var(--mute);margin:6px 0 0}
+.nail{cursor:pointer}
+.sel{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.sel{animation:none}}
+@media(max-width:860px){main{grid-template-columns:minmax(0,1fr)}.stage svg{height:min(60vh,460px);min-height:280px}.hint{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<header><h1>Nail Art Preview</h1><p>Pick a design, see it on the client's hands before they order.</p></header>
+<main>
+  <section class="stage" aria-label="Hand preview">
+    <svg id="stage" viewBox="0 -10 720 480" role="img" aria-label="Preview of hands with nail designs"></svg>
+    <div class="bar">
+      <div class="seg" id="view" role="group" aria-label="View">
+        <button data-v="both" aria-pressed="true">Both hands</button><button data-v="R">Right</button><button data-v="L">Left</button>
+      </div>
+      <div class="seg" id="mode" role="group" aria-label="Apply to">
+        <button data-m="all" aria-pressed="true">All nails</button><button data-m="one">Selected nail</button><button data-m="accent">Ring accent</button>
+      </div>
+      <span class="hint" id="hint">Tap a nail to style it individually.</span>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <div>
+      <h2>Designs <small id="setname"></small></h2>
+      <div class="row" id="cols" style="margin-bottom:10px"></div>
+      <div class="grid" id="designs"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" id="applySet">Apply as full set (one per nail)</button>
+        <label class="btn ghost upload">+ Upload nail art<input type="file" id="file" accept="image/*" multiple></label>
+      </div>
+      <p class="note">Sample designs, drawn in code. Uploaded photos (a single nail tip works best) are added to “My uploads” and stay on this device only.</p>
+    </div>
+    <div>
+      <h2>Shape</h2>
+      <div class="row" id="shapes"></div>
+    </div>
+    <div>
+      <h2>Length <small id="lenlbl"></small></h2>
+      <input type="range" id="len" min="0" max="100" value="45" aria-label="Nail length">
+    </div>
+    <div>
+      <h2>Skin tone</h2>
+      <div class="row" id="skins"></div>
+    </div>
+    <div>
+      <h2>Order summary</h2>
+      <input type="text" id="client" placeholder="Client name (optional)" aria-label="Client name">
+      <pre class="order" id="order"></pre>
+      <div class="row"><button class="btn" id="copy">Copy order</button><button class="btn ghost" id="reset">Reset</button></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+{
+/* ================= INVENTORY (edit here) =================
+   Designs: either procedural ({base, smoke, veins, gold, swirl, flakes, glitter, french, chrome, outline, dot})
+   or image-based ({n:'Name', img:'data:image/png;base64,...'}) — image is cropped to the nail shape.
+   Hands: SVG hand drawn from finger geometry below. Later: add photo hands with nail anchor points. */
+const COLLECTIONS=[
+ {id:'nude',name:'Nude & Gold',d:[
+  {n:'Mocha Marble',base:['#b99a86'],smoke:[['#8a6652',.5,3]],veins:['#6e4e3d',2,.5],gold:2},
+  {n:'Champagne Swirl',base:['#f1e6da','#e2cdb8'],swirl:2},
+  {n:'Caramel Wave',base:['#c58f62','#f0dcc6'],smoke:[['#ffffff',.35,2]],swirl:1},
+  {n:'Pearl Gilt',base:['#f6f1ec'],smoke:[['#e3d3c4',.6,3]],dot:1,gold:1},
+  {n:'Toffee Glass',base:['#d39f72','#f6e6d6'],smoke:[['#a26a43',.45,2]]},
+  {n:'Gold Foil Nude',base:['#ecd9c6'],flakes:14},
+  {n:'Bronze Marble',base:['#a46b3d'],smoke:[['#d7a774',.5,3]],veins:['#f7ecdf',2,.45],gold:1},
+  {n:'Sand Speckle',base:['#efe5d8'],glitter:['#b89656',60]},
+  {n:'Latte Smoke',base:['#dcc4ad'],smoke:[['#8b6a55',.55,4]],veins:['#ffffff',1,.4]},
+  {n:'Espresso Gilt',base:['#5e3b28','#8c5f3f'],swirl:2,flakes:5}]},
+ {id:'blue',name:'Blue Marble',d:[
+  {n:'Denim Ombre',base:['#34507f','#e8eef7'],gold:1},
+  {n:'Sky Marble',base:['#eef3fa'],smoke:[['#7f9fd0',.45,3]],veins:['#5a7bb5',1,.35]},
+  {n:'Powder Cloud',base:['#c6d4ec'],smoke:[['#ffffff',.6,3],['#8ea8d6',.4,2]]},
+  {n:'Frost Shimmer',base:['#aebfe0','#e4ebf6'],glitter:['#ffffff',90]},
+  {n:'Lapis Gilt',base:['#22396a','#4a6aa6'],smoke:[['#8fb0e6',.35,2]],gold:2},
+  {n:'Ink Marble',base:['#f7f9fc'],smoke:[['#9bb2d9',.3,2]],veins:['#2b3f6b',3,.45]},
+  {n:'Storm Marble',base:['#8c9bb3'],smoke:[['#dfe6f0',.55,3]],veins:['#3c4c6b',1,.4],gold:1},
+  {n:'Midnight Foil',base:['#17223f'],flakes:12,glitter:['#c9a85a',25]},
+  {n:'Glacier',base:['#dde7f3'],veins:['#ffffff',2,.6],glitter:['#ffffff',40]},
+  {n:'Cobalt Swirl',base:['#2f4f8f'],smoke:[['#6f8fd0',.5,2]],swirl:2}]},
+ {id:'rose',name:'Rose & Mauve',d:[
+  {n:'Rosewood Marble',base:['#b97b7c'],smoke:[['#e7bfbd',.5,3]],veins:['#7d4448',1,.4],gold:1},
+  {n:'Blush Foil',base:['#f2d8d1'],flakes:10},
+  {n:'Mauve Glass',base:['#9c6378','#e9c9cf']},
+  {n:'Rose Quartz',base:['#eabfc2'],smoke:[['#ffffff',.4,2]],veins:['#ffffff',2,.55]},
+  {n:'Plum Marble',base:['#8a4a60'],smoke:[['#c98ea2',.45,3]],gold:2},
+  {n:'Berry Velvet',base:['#6f2a40','#8e3b55']},
+  {n:'Petal Ombre',base:['#d79ea6','#f7e2df']},
+  {n:'Gilded Outline',base:['#efd3cd'],outline:1},
+  {n:'Champagne Rose',base:['#efd2c6'],glitter:['#d6b56d',70]},
+  {n:'Wine Marble',base:['#5f2434'],smoke:[['#a0506a',.5,3]],gold:2}]},
+ {id:'classic',name:'Classics',d:[
+  {n:'French Tip',base:['#f4ddd4'],french:'#ffffff'},
+  {n:'Milky White',base:['#f4efe8'],smoke:[['#ffffff',.5,2]]},
+  {n:'Classic Red',base:['#b3122b','#c8243b']},
+  {n:'Black Gloss',base:['#141414']},
+  {n:'Chrome Silver',chrome:['#8d939b','#f5f7fa','#6e747c','#e3e6ea','#9aa0a8']},
+  {n:'Rose Gold Chrome',chrome:['#b07a68','#f7d9cc','#9a6556','#f0c7b6','#b98575']},
+  {n:'Gold Glitter',base:['#c9a24e'],glitter:['#fff4c4',120]},
+  {n:'Baby Boomer',base:['#ffffff','#f1c9c3']},
+  {n:'Nude Gloss',base:['#e4bfaa']},
+  {n:'Glazed Pearl',chrome:['#efe7df','#ffffff','#e3d6cb','#fbf7f2','#e8ddd3']}]},
+ {id:'mine',name:'My uploads',d:[]}
+];
+const SHAPES=['Almond','Coffin','Square','Squoval','Oval','Round','Stiletto'];
+const SKINS=['#f6d7c3','#eac0a0','#d4a07a','#b67b52','#8d5a3b','#5e3a26'];
+const FINGERS=[ // left-on-screen hand (client's right), thumb toward centre
+ {k:'Thumb', x:248,y:318,rot:42, L:118,wb:40,wt:31},
+ {k:'Index', x:206,y:226,rot:6,  L:150,wb:36,wt:28},
+ {k:'Middle',x:162,y:218,rot:0,  L:166,wb:37,wt:29},
+ {k:'Ring',  x:118,y:224,rot:-5, L:152,wb:35,wt:27},
+ {k:'Pinky', x:78, y:240,rot:-12,L:118,wb:31,wt:24}];
+const PALM='M86 470C80 400 60 330 60 270C60 238 65 222 77 214C104 204 170 198 222 206C238 210 245 226 247 250C251 282 263 300 257 332C247 384 216 426 208 470Z';
+const SCREEN_ORDER=['R4','R3','R2','R1','R0','L0','L1','L2','L3','L4']; // left→right as displayed
+
+/* ================= STATE ================= */
+const S={col:'nude',shape:'Almond',len:.45,skin:SKINS[1],view:'both',mode:'all',sel:null,nails:{}};
+const allIds=SCREEN_ORDER.slice();
+const designById={};
+COLLECTIONS.forEach(c=>c.d.forEach((d,i)=>{d.id=d.id||c.id+i;designById[d.id]=d}));
+try{const saved=JSON.parse(localStorage.getItem('nailUploads')||'[]');saved.forEach(addUpload)}catch(e){}
+function resetNails(){allIds.forEach(id=>S.nails[id]=COLLECTIONS[0].d[0].id)}
+resetNails();
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);const f=v=>Math.max(0,Math.min(255,Math.round(v*(1+amt))));return'#'+[f(n>>16),f(n>>8&255),f(n&255)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+const r1=v=>Math.round(v*10)/10;
+function smooth(p){let d=`M${r1(p[0][0])} ${r1(p[0][1])}`;for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c;d+=`C${r1(b[0]+(c[0]-a[0])/6)} ${r1(b[1]+(c[1]-a[1])/6)} ${r1(c[0]-(e[0]-b[0])/6)} ${r1(c[1]-(e[1]-b[1])/6)} ${r1(c[0])} ${r1(c[1])}`}return d}
+
+/* nail outline in local frame: x 0..w, y 0 = free edge, y h = cuticle */
+function nailPath(shape,w,h){
+ const c=w*.32,yb=h-c,cut=`C${r1(w)} ${r1(h+c*.25)} 0 ${r1(h+c*.25)} 0 ${r1(yb)}Z`;
+ let tip;
+ switch(shape){
+  case'Square':{const y=Math.min(w*.12,yb);tip=`L0 ${r1(y)}Q0 0 ${r1(w*.12)} 0L${r1(w*.88)} 0Q${r1(w)} 0 ${r1(w)} ${r1(y)}`;break}
+  case'Squoval':{const y=Math.min(w*.3,yb);tip=`L0 ${r1(y)}C0 ${r1(w*.02)} ${r1(w*.2)} 0 ${r1(w*.5)} 0C${r1(w*.8)} 0 ${r1(w)} ${r1(w*.02)} ${r1(w)} ${r1(y)}`;break}
+  case'Round':{const y=Math.min(w*.5,yb);tip=`L0 ${r1(y)}A${r1(w/2)} ${r1(y)} 0 0 1 ${r1(w)} ${r1(y)}`;break}
+  case'Oval':{const y=Math.min(w*.62,yb);tip=`L0 ${r1(y)}C0 ${r1(-w*.15)} ${r1(w)} ${r1(-w*.15)} ${r1(w)} ${r1(y)}`;break}
+  case'Coffin':{const y=Math.min(h*.6,yb);tip=`L0 ${r1(y)}L${r1(w*.2)} ${r1(w*.06)}Q${r1(w*.22)} 0 ${r1(w*.3)} 0L${r1(w*.7)} 0Q${r1(w*.78)} 0 ${r1(w*.8)} ${r1(w*.06)}L${r1(w)} ${r1(y)}`;break}
+  case'Stiletto':{const y=Math.min(h*.62,yb);tip=`L0 ${r1(y)}C0 ${r1(h*.35)} ${r1(w*.44)} ${r1(h*.06)} ${r1(w*.5)} 0C${r1(w*.56)} ${r1(h*.06)} ${r1(w)} ${r1(h*.35)} ${r1(w)} ${r1(y)}`;break}
+  default:{const y=Math.min(h*.5,yb);tip=`L0 ${r1(y)}C0 ${r1(h*.22)} ${r1(w*.34)} 0 ${r1(w*.5)} 0C${r1(w*.66)} 0 ${r1(w)} ${r1(h*.22)} ${r1(w)} ${r1(y)}`}
+ }
+ return `M0 ${r1(yb)}${tip}L${r1(w)} ${r1(yb)}${cut}`;
+}
+
+/* procedural design → SVG markup inside the nail clip */
+function renderDesign(d,w,h,seed,uid,path,plate){
+ const R=rng(seed*9973+7);let o='',defs='';
+ if(d.img){return `<rect width="${w}" height="${h}" fill="#eee"/><image href="${esc(d.img)}" x="0" y="0" width="${r1(w)}" height="${r1(h+2)}" preserveAspectRatio="xMidYMid slice"/>`}
+ if(d.chrome){const st=d.chrome.map((c,i)=>`<stop offset="${i/(d.chrome.length-1)}" stop-color="${c}"/>`).join('');defs+=`<linearGradient id="${uid}b" x1="0" y1="0" x2="1" y2=".7">${st}</linearGradient>`;o+=`<rect x="-2" y="-2" width="${w+4}" height="${h+4}" fill="url(#${uid}b)"/>`}
+ else if(d.base.length>1){defs+=`<linearGradient id="${uid}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${d.base[0]}"/><stop offset="1" stop-color="${d.base[1]}"/></linearGradient>`;o+=`<rect x="-2" y="-2" width="${w+4}" height="${h+4}" fill="url(#${uid}b)"/>`}
+ else o+=`<rect x="-2" y="-2" width="${w+4}" height="${h+4}" fill="${d.base[0]}"/>`;
+ (d.smoke||[]).forEach(([c,op,n])=>{for(let i=0;i<n;i++)o+=`<ellipse cx="${r1(R()*w)}" cy="${r1(R()*h)}" rx="${r1(w*(.25+R()*.4))}" ry="${r1(h*(.12+R()*.22))}" transform="rotate(${r1(R()*80-40)} ${r1(w/2)} ${r1(h/2)})" fill="${c}" opacity="${op}" filter="url(#blurL)"/>`});
+ const vein=()=>{const pts=[];let x=R()*w;const dx=(R()-.5)*w*.5;for(let i=0;i<6;i++){pts.push([x,-4+i*(h+8)/5]);x+=dx/5+(R()-.5)*w*.35}return smooth(pts)};
+ if(d.veins){const[c,n,vw]=d.veins;for(let i=0;i<n;i++){const p=vein();o+=`<path d="${p}" stroke="${c}" stroke-width="${vw*3}" fill="none" opacity=".3" filter="url(#blurS)"/><path d="${p}" stroke="${c}" stroke-width="${vw}" fill="none" opacity=".85"/>`}}
+ for(let i=0;i<(d.gold||0);i++){const p=vein();o+=`<path d="${p}" stroke="url(#goldG)" stroke-width="${r1(.7+R()*.6)}" fill="none" stroke-linecap="round"/>`}
+ for(let i=0;i<(d.swirl||0);i++){const y0=h*(.15+R()*.6),a=h*(.12+R()*.12);const p=`M-2 ${r1(y0)}C${r1(w*.35)} ${r1(y0-a)} ${r1(w*.65)} ${r1(y0+a)} ${r1(w+2)} ${r1(y0-a*.3)}`;o+=`<path d="${p}" stroke="url(#goldG)" stroke-width="1.1" fill="none"/><path d="${p}" stroke="url(#goldG)" stroke-width=".45" fill="none" transform="translate(0 2.2)" opacity=".8"/>`}
+ for(let i=0;i<(d.flakes||0);i++){const cx=R()*w,cy=R()*h,s=1+R()*3.2,k=4+Math.floor(R()*3);let pts=[];for(let j=0;j<k;j++){const a=j/k*6.283+R()*.6,rr=s*(.5+R()*.6);pts.push(r1(cx+Math.cos(a)*rr)+','+r1(cy+Math.sin(a)*rr))}o+=`<polygon points="${pts.join(' ')}" fill="url(#goldG)" opacity="${r1(.75+R()*.25)}"/>`}
+ if(d.glitter){const[c,n]=d.glitter;for(let i=0;i<n;i++)o+=`<circle cx="${r1(R()*w)}" cy="${r1(R()*h)}" r="${r1(.25+R()*.55)}" fill="${R()>.3?c:'#ffffff'}" opacity="${r1(.5+R()*.5)}"/>`}
+ if(d.french){const td=Math.max(h-plate*.82,h*.24);o+=`<path d="M-2 -2H${w+2}V${r1(td*1.25)}Q${r1(w/2)} ${r1(td*.35)} -2 ${r1(td*1.25)}Z" fill="${d.french}"/>`}
+ if(d.dot)o+=`<circle cx="${r1(w/2)}" cy="${r1(h*.62)}" r="1.4" fill="url(#goldG)"/>`;
+ if(d.outline)o+=`<path d="${path}" fill="none" stroke="url(#goldG)" stroke-width="2.4"/>`;
+ return `<defs>${defs}</defs>${o}`;
+}
+function glossOverlay(w,h,path){
+ return `<rect x="${r1(w*.14)}" y="${r1(h*.1)}" width="${r1(w*.13)}" height="${r1(h*.7)}" rx="${r1(w*.06)}" fill="url(#glossG)" filter="url(#blurS)"/>
+ <ellipse cx="${r1(w*.7)}" cy="${r1(h*.22)}" rx="${r1(w*.08)}" ry="${r1(h*.05)}" fill="#fff" opacity=".35" filter="url(#blurS)"/>
+ <path d="${path}" fill="none" stroke="#000" stroke-opacity=".16" stroke-width="2"/>`;
+}
+
+/* one nail: returns markup + its local geometry */
+function nailMarkup(id,f,w,plate,designId,isThumb){
+ const ext=plate*1.25*S.len, h=plate+ext, path=nailPath(S.shape,w,h);
+ const d=designById[designId]||COLLECTIONS[0].d[0];
+ const uid='n'+id;
+ const seed=[...id].reduce((a,c)=>a+c.charCodeAt(0),0)+[...designId].reduce((a,c)=>a*31+c.charCodeAt(0)|0,0);
+ const sel=S.sel===id?`<path class="sel" d="${path}" fill="none" stroke="#f2c66b" stroke-width="2.4" stroke-dasharray="4 3"/>`:'';
+ return {h,svg:`<g class="nail" data-nail="${id}" filter="url(#nailShadow)">
+  <path d="${path}" fill="${shade(S.skin,-.28)}" stroke="${shade(S.skin,-.28)}" stroke-width="2.6"/>
+  <clipPath id="${uid}c"><path d="${path}"/></clipPath>
+  <g clip-path="url(#${uid}c)">${renderDesign(d,w,h,seed,uid,path,plate)}${glossOverlay(w,h,path)}</g>${sel}</g>`};
+}
+
+function fingerPath(L,wb,wt){const b=wb/2,t=wt/2;return`M${-b} 30L${-b} 0C${-b} ${r1(-L*.45)} ${-t} ${r1(-L*.72)} ${-t} ${r1(-L+t)}A${t} ${r1(t*1.05)} 0 0 1 ${t} ${r1(-L+t)}C${t} ${r1(-L*.72)} ${b} ${r1(-L*.45)} ${b} 0L${b} 30Z`}
+function creases(L,wb,wt){let o='';[[.42,3],[.7,2]].forEach(([p,n])=>{const y=-L*p,hw=(wb+(wt-wb)*p)/2*.55;for(let i=0;i<n;i++){const yy=y+i*3-n;o+=`<path d="M${r1(-hw)} ${r1(yy)}Q0 ${r1(yy+2.5-i)} ${r1(hw)} ${r1(yy)}" stroke="${shade(S.skin,-.3)}" stroke-width=".8" fill="none" opacity=".45"/>`}});return o}
+
+function handMarkup(side){
+ const sk=S.skin,dk=shade(sk,-.22);
+ let outline='',fill='',nails='',detail='';
+ FINGERS.forEach((f,i)=>{
+  const fp=fingerPath(f.L,f.wb,f.wt),tr=`translate(${f.x} ${f.y}) rotate(${f.rot})`;
+  outline+=`<path d="${fp}" transform="${tr}"/>`;
+  fill+=`<path d="${fp}" transform="${tr}" data-nail="${side}${i}" class="nail"/>`;
+  detail+=`<g transform="${tr}">${creases(f.L,f.wb,f.wt)}</g>`;
+  const w=f.wt*.74,plate=w*(i===0?1.05:1.18),id=side+i;
+  const nm=nailMarkup(id,f,w,plate,S.nails[id],i===0);
+  const yc=-f.L+plate*.92+2;
+  nails+=`<g transform="${tr} translate(${r1(-w/2)} ${r1(yc-nm.h)})">${nm.svg}</g>`;
+ });
+ const knuckles=FINGERS.slice(1).map(f=>`<ellipse cx="${f.x}" cy="${f.y+6}" rx="11" ry="7" fill="#fff" opacity=".13" filter="url(#blurL)"/>`).join('');
+ const tendons=FINGERS.slice(1).map(f=>`<path d="M${f.x} ${f.y+14}Q${(f.x+150)/2} ${f.y+110} ${140+(f.x-150)*.2} 440" stroke="${dk}" stroke-width="1.2" fill="none" opacity=".18"/>`).join('');
+ return `<g filter="url(#handShadow)">
+  <g fill="${sk}" stroke="${dk}" stroke-width="3">${outline}<path d="${PALM}"/></g>
+  <g fill="${sk}">${fill}<path d="${PALM}"/></g>
+  <path d="${PALM}" fill="url(#palmLight)"/>
+  ${knuckles}${tendons}${detail}</g>${nails}`;
+}
+
+const DEFS=`<defs>
+ <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a6a2b"/><stop offset=".3" stop-color="#f6e3a1"/><stop offset=".55" stop-color="#b8913f"/><stop offset=".8" stop-color="#fff3c4"/><stop offset="1" stop-color="#9c7a33"/></linearGradient>
+ <linearGradient id="glossG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+ <radialGradient id="palmLight" cx=".5" cy=".25" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></radialGradient>
+ <filter id="blurS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".6"/></filter>
+ <filter id="blurL" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+ <filter id="nailShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation=".8" flood-opacity=".35"/></filter>
+ <filter id="handShadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".45"/></filter>
+</defs>`;
+
+/* ================= RENDER ================= */
+const VB={both:'0 -10 720 480',R:'20 -10 350 480',L:'350 -10 350 480'};
+function renderStage(){
+ const svg=$('#stage');svg.setAttribute('viewBox',VB[S.view]);
+ svg.innerHTML=DEFS+(S.view!=='L'?`<g>${handMarkup('R')}</g>`:'')+(S.view!=='R'?`<g transform="translate(720 0) scale(-1 1)">${handMarkup('L')}</g>`:'')+`
+ <text x="175" y="462" fill="#cdbcc3" font-size="13" text-anchor="middle" font-family="Figtree,sans-serif">Right hand</text><text x="545" y="462" fill="#cdbcc3" font-size="13" text-anchor="middle" font-family="Figtree,sans-serif">Left hand</text>`;
+}
+function swatch(d){
+ const w=22,plate=26,h=plate+plate*.9,path=nailPath(S.shape,w,h),uid='s'+d.id;
+ return `<svg viewBox="-4 -3 30 ${h+8}" aria-hidden="true">${DEFS}<clipPath id="${uid}c"><path d="${path}"/></clipPath><g clip-path="url(#${uid}c)">${renderDesign(d,w,h,7,uid,path,plate)}${glossOverlay(w,h,path)}</g></svg>`;
+}
+function renderPanel(){
+ const col=COLLECTIONS.find(c=>c.id===S.col);
+ $('#cols').innerHTML=COLLECTIONS.map(c=>`<button class="chip" data-col="${c.id}" aria-pressed="${c.id===S.col}">${esc(c.name)}</button>`).join('');
+ $('#setname').textContent=col.d.length?col.d.length+' designs':'';
+ const active=S.mode==='one'&&S.sel?S.nails[S.sel]:null;
+ $('#designs').innerHTML=col.d.length?col.d.map(d=>`<button class="sw" data-d="${d.id}" aria-pressed="${d.id===active}" title="${esc(d.n)}">${swatch(d)}<span>${esc(d.n)}</span></button>`).join(''):`<p class="note" style="grid-column:1/-1">No uploads yet. Use “+ Upload nail art” to add a photo of a nail design.</p>`;
+ $('#applySet').disabled=!col.d.length;
+ $('#shapes').innerHTML=SHAPES.map(s=>`<button class="chip" data-shape="${s}" aria-pressed="${s===S.shape}">${s}</button>`).join('');
+ $('#skins').innerHTML=SKINS.map(s=>`<button class="skin" data-skin="${s}" style="background:${s}" aria-pressed="${s===S.skin}" aria-label="Skin tone ${s}"></button>`).join('');
+ $('#lenlbl').textContent=S.len<.2?'Short':S.len<.5?'Medium':S.len<.8?'Long':'Extra long';
+ document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.view));
+ document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.mode));
+ const label=id=>(id[0]==='R'?'Right ':'Left ')+FINGERS[+id[1]].k.toLowerCase();
+ $('#hint').textContent=S.mode==='one'?(S.sel?'Styling: '+label(S.sel):'Tap a nail to select it.'):S.mode==='accent'?'Designs go on both ring fingers.':'Tap a nail to style it individually.';
+ renderOrder();
+}
+function renderOrder(){
+ const label=id=>(id[0]==='R'?'R ':'L ')+FINGERS[+id[1]].k;
+ const name=$('#client').value.trim();
+ const lines=[(name?'Client: '+name+'\n':'')+'Shape: '+S.shape+' · Length: '+$('#lenlbl').textContent,''];
+ ['R','L'].forEach(s=>[0,1,2,3,4].forEach(i=>{const id=s+i;lines.push(label(id).padEnd(10)+' '+(designById[S.nails[id]]?.n||'—'))}));
+ $('#order').textContent=lines.join('\n');
+}
+function render(){renderStage();renderPanel()}
+
+/* ================= ACTIONS ================= */
+function applyDesign(did){
+ if(S.mode==='all')allIds.forEach(id=>S.nails[id]=did);
+ else if(S.mode==='accent'){S.nails.R3=did;S.nails.L3=did}
+ else if(S.sel)S.nails[S.sel]=did;
+ else{$('#hint').textContent='Tap a nail first, then pick a design.';return}
+ render();
+}
+function addUpload(u){const c=COLLECTIONS.find(c=>c.id==='mine');const d={n:u.n,img:u.img,id:'mine'+c.d.length};c.d.push(d);designById[d.id]=d}
+function saveUploads(){try{localStorage.setItem('nailUploads',JSON.stringify(COLLECTIONS.find(c=>c.id==='mine').d.map(d=>({n:d.n,img:d.img}))))}catch(e){}}
+function readImage(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,320/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',.85))};im.onerror=()=>res(null);im.src=fr.result};fr.onerror=()=>res(null);fr.readAsDataURL(file)})}
+
+$('#stage').addEventListener('click',e=>{const g=e.target.closest('[data-nail]');if(!g)return;const id=g.dataset.nail;S.sel=S.sel===id&&S.mode==='one'?null:id;S.mode='one';render()});
+$('#designs').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b)applyDesign(b.dataset.d)});
+$('#cols').addEventListener('click',e=>{const b=e.target.closest('[data-col]');if(b){S.col=b.dataset.col;renderPanel()}});
+$('#shapes').addEventListener('click',e=>{const b=e.target.closest('[data-shape]');if(b){S.shape=b.dataset.shape;render()}});
+$('#skins').addEventListener('click',e=>{const b=e.target.closest('[data-skin]');if(b){S.skin=b.dataset.skin;render()}});
+$('#view').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(b){S.view=b.dataset.v;render()}});
+$('#mode').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b){S.mode=b.dataset.m;if(S.mode!=='one')S.sel=null;render()}});
+let raf;$('#len').addEventListener('input',e=>{S.len=e.target.value/100;cancelAnimationFrame(raf);raf=requestAnimationFrame(render)});
+$('#applySet').addEventListener('click',()=>{const c=COLLECTIONS.find(c=>c.id===S.col);if(!c.d.length)return;SCREEN_ORDER.forEach((id,i)=>S.nails[id]=c.d[i%c.d.length].id);S.mode='all';S.sel=null;render()});
+$('#file').addEventListener('change',async e=>{for(const f of e.target.files){const img=await readImage(f);if(img)addUpload({n:f.name.replace(/\.[^.]+$/,'').slice(0,24),img})}saveUploads();S.col='mine';e.target.value='';render()});
+$('#client').addEventListener('input',renderOrder);
+$('#copy').addEventListener('click',async()=>{const t=$('#order').textContent;try{await navigator.clipboard.writeText(t);$('#copy').textContent='Copied'}catch(err){const r=document.createRange();r.selectNodeContents($('#order'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('#copy').textContent='Selected — press Ctrl/Cmd+C'}setTimeout(()=>$('#copy').textContent='Copy order',1800)});
+$('#reset').addEventListener('click',()=>{resetNails();S.sel=null;S.mode='all';render()});
+render();
+}
+</script>
+</body>
+</html>
